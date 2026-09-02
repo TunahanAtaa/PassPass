@@ -75,9 +75,10 @@ uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 
 ### 6. API Dokümantasyonu & Health Check
 
-- **Health Check**: [http://localhost:8000/health](http://localhost:8000/health)
+- **Health Check**: [http://localhost:8000/api/v1/health](http://localhost:8000/api/v1/health)
 - **Interactive Swagger Docs**: [http://localhost:8000/docs](http://localhost:8000/docs)
 - **ReDoc**: [http://localhost:8000/redoc](http://localhost:8000/redoc)
+
 
 ### 7. Testleri Çalıştırma
 

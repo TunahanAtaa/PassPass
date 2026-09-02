@@ -15,8 +15,9 @@ class Settings(BaseSettings):
     POSTGRES_SERVER: str = "localhost"
     POSTGRES_PORT: int = 5432
     POSTGRES_USER: str = "passpass"
-    POSTGRES_PASSWORD: str = "passpass_dev_secret"
+    POSTGRES_PASSWORD: str = ""
     POSTGRES_DB: str = "passpass_db"
+
 
     # CORS Configuration
     CORS_ORIGINS: List[str] = [

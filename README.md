@@ -1,4 +1,4 @@
-# PassPass — Secure, Modern & Self-Hosted Password Manager 🔐
+# PassPass — Modern, Security-Focused & Self-Hosted Password Manager 🔐
 
 <div align="center">
 
@@ -10,20 +10,21 @@
 ![Docker](https://img.shields.io/badge/Docker-Compose-2496ED.svg?style=for-the-badge&logo=docker&logoColor=white)
 ![Argon2id](https://img.shields.io/badge/KDF-Argon2id-critical.svg?style=for-the-badge)
 ![AES-256-GCM](https://img.shields.io/badge/Cipher-AES--256--GCM-success.svg?style=for-the-badge)
-![Tests](https://img.shields.io/badge/Tests-181%20Passed-brightgreen.svg?style=for-the-badge)
+![Tests](https://img.shields.io/badge/Tests-181%20Automated-brightgreen.svg?style=for-the-badge)
 ![License](https://img.shields.io/badge/License-MIT-blue.svg?style=for-the-badge)
 
 <p align="center">
-  <b>Uçtan uca güvenli, modern, hafif ve bağımsız barındırılabilir (self-hosted) kişisel şifre yöneticisi.</b>
+  <b>Güvenlik odaklı, modern, hafif ve bağımsız barındırılabilir (self-hosted) kişisel şifre yöneticisi.</b>
   <br />
-  Master password veya kasa şifreleme anahtarları asla veritabanında saklanmaz.
+  Master password ve kasa şifreleme anahtarları veritabanında asla kalıcı olarak saklanmaz.
 </p>
 
-[Özellikler](#-özellikler) •
+[Özellikler](#-öne-çıkan-özellikler) •
 [Güvenlik Mimarisi](#-güvenlik--kriptografi-mimarisi) •
+[Tehdit Modeli & Kısıtlamalar](#-tehdit-modeli-ve-kısıtlamalar-threat-model--limitations) •
 [Teknoloji Stack'i](#️-teknoloji-stacki) •
 [Hızlı Başlangıç](#-hızlı-başlangıç--kurulum) •
-[API Dokümantasyonu](#-api-referansı) •
+[API Referansı](#-api-referansı) •
 [Testler](#-test--doğrulama)
 
 </div>
@@ -32,16 +33,16 @@
 
 ## 🌟 Öne Çıkan Özellikler
 
-- 🛡️ **Zero-Knowledge Yaklaşımı**: Master password ve kasa anahtarı veritabanında **asla** saklanmaz.
-- 🔑 **Argon2id KDF**: Kullanıcıya özel 16 baytlık benzersiz salt ile GPU/ASIC saldırılarına karşı yüksek bellek ve zaman maliyetli anahtar türetimi.
-- 🔒 **AES-256-GCM Authenticated Encryption**: Her kayıt için benzersiz 12 baytlık rastgele Nonce ve 16 baytlık Auth Tag ile veri bütünlüğü garantisi.
-- ⏱️ **İzole & Güvenli Kasa Oturumu**: `vault_key` sunucu tarafındaki thread-safe in-memory oturum deposunda tutulur; istemciye yalnızca kısa ömürlü, opak UUID `vault_token` iletilir.
-- 🎲 **Kriptografik Güvenli Şifre Üretici**: Web Crypto API (`crypto.getRandomValues`) tabanlı, özelleştirilebilir uzunluk ve karakter setli güçlü şifre üretimi.
+- 🛡️ **Zero-Knowledge Yaklaşımı**: Master password ve kasa şifreleme anahtarı (`vault_key`) veritabanında **asla** saklanmaz; yalnızca kullanıcı oturumu süresince RAM'de tutulur.
+- 🔑 **Argon2id KDF**: Kullanıcıya özel 16 baytlık rastgele salt ile GPU/ASIC tabanlı kaba kuvvet (brute-force) saldırılarının hesaplama ve bellek maliyetini ciddi ölçüde artırır (`m=64MB, t=3, p=4`).
+- 🔒 **AES-256-GCM Kimlik Doğrulamalı Şifreleme**: Her kayıt için benzersiz 12 baytlık rastgele Nonce ve 16 baytlık Auth Tag ile kriptografik bütünlük doğrulaması (integrity authentication) sağlar.
+- ⏱️ **İzole Kasa Oturumu (`vault_token`)**: `vault_key` sunucu tarafındaki thread-safe in-memory oturum deposunda tutulur; istemciye yalnızca kısa ömürlü, opak UUID `vault_token` iletilir. Çıkış yapıldığında oturum deposundaki referans derhal temizlenir.
+- 🎲 **Kriptografik Güvenli Şifre Üretici**: Web Crypto API (`window.crypto.getRandomValues`) tabanlı, özelleştirilebilir uzunluk ve karakter setli güçlü şifre üretimi.
 - 📊 **Gerçek Zamanlı Şifre Gücü Ölçer**: Entropi ve karakter dağılımı analizine dayalı anlık güç göstergesi.
 - 📋 **Tek Tıkla Pano Kopyalama**: Hassas bilgilerin hızlı ve güvenli kopyalanması.
-- 🎨 **Modern Glassmorphism UI**: Vanilla CSS ile hazırlanmış, sıfır harici CSS framework bağımlılığına sahip, karanlık mod odaklı ve tamamen responsive kullanıcı arayüzü.
-- 🩺 **Canlı Sağlık & Durum Kontrolü**: Veritabanı ve servis durumunu gerçek zamanlı izleyen `/api/v1/health` uç noktası ve arayüz indikatörü.
-- 🧪 **%100 Test Kapsamı**: 104 adet Pytest backend testi (birim + entegrasyon + E2E smoke) ve 77 adet Vitest/RTL frontend testi ile toplam **181 test**.
+- 🎨 **Modern Glassmorphism UI**: Vanilla CSS ile hazırlanmış, sıfır harici CSS framework bağımlılığına sahip, karanlık mod odaklı ve responsive kullanıcı arayüzü.
+- 🩺 **Canlı Sağlık & Durum Kontrolü**: Veritabanı ve servis durumunu anlık izleyen `/api/v1/health` uç noktası ve arayüz indikatörü.
+- 🧪 **181 Adet Otomatik Test**: 104 adet Pytest backend testi (birim + entegrasyon + E2E smoke) ve 77 adet Vitest/RTL frontend testi ile doğrulanmış kararlı mimari.
 
 ---
 
@@ -90,15 +91,27 @@ flowchart TD
 
 1. **Master Password KDF (Argon2id)**:
    - Formül: `vault_key = Argon2id(master_password, salt=vault_kdf_salt, memory=64MB, iterations=3, parallelism=4, length=32B)`
-   - Master password hash'i (`user.hashed_password`) ile kasa anahtarı (`vault_key`) birbirinden bağımsız adımlarda işlenir.
+   - Master password hash'i (`user.hashed_password`) ile kasa anahtarı (`vault_key`) birbirinden bağımsız adımlarda ve farklı amaçlarla işlenir.
 2. **Kasa Oturumu & Bellek İzolasyonu (`VaultSessionStore`)**:
-   - `vault_key`, API yanıtlarında veya veritabanında asla tutulmaz.
-   - Yalnızca RAM üzerinde thread-safe bir yapıda tutulur ve kullanıcı çıkış yaptığında derhal bellekten silinir.
+   - `vault_key`, API yanıtlarında veya veritabanında asla kalıcı olarak saklanmaz.
+   - Yalnızca RAM üzerinde thread-safe bir oturum deposunda tutulur; kullanıcı çıkış yaptığında veya oturum süresi dolduğunda referansı oturum deposundan kaldırılır.
 3. **AES-256-GCM Kimlik Doğrulamalı Şifreleme**:
-   - Her kasa kaydının şifresi ve notu ayrı bir rastgele 12 bayt IV/Nonce ile şifrelenir.
-   - 16 baytlık Auth Tag ile veride en ufak bir bit manipülasyonu olması durumunda işlem anında reddedilir.
+   - Her kasa kaydının şifresi ve notu için ayrı, rastgele 12 bayt IV/Nonce üretilir.
+   - 16 baytlık kimlik doğrulama etiketi (Auth Tag) ile veride en ufak bir bit manipülasyonu olması durumunda bütünlük doğrulaması başarısız olur ve işlem anında reddedilir.
 4. **Kriptografik Rastgelelik (CSPRNG)**:
-   - Arayüzdeki şifre üretici hiçbir koşulda `Math.random()` kullanmaz; doğrudan `window.crypto.getRandomValues` ile çalışır.
+   - Arayüzdeki şifre üretici hiçbir koşulda zayıf psödo-rastgele `Math.random()` kullanmaz; doğrudan tarayıcının `window.crypto.getRandomValues` fonksiyonu ile çalışır.
+
+---
+
+## 🛡️ Tehdit Modeli ve Kısıtlamalar (Threat Model & Limitations)
+
+> [!IMPORTANT]
+> Güvenlik odaklı bir mimaride sınırların ve varsayımların şeffaf bir biçimde tanımlanması esastır.
+
+- **Güvenilir Dağıtım Ortamı Varsayımı (Trusted Deployment)**: PassPass, istemci ve sunucu süreçlerinin güvenli ve güvenilir bir barındırma ortamında çalıştığını varsayar. Taşıma katmanı güvenliği (TLS 1.3 / HTTPS) zorunludur; aksi takdirde ağ dinleme (MitM) saldırılarına karşı token ve parolalar korunamayabilir.
+- **Sunucu Bellek Güvenliği (Server Memory & Process Compromise)**: Şifre çözme işlemleri backend üzerinde gerçekleştirildiği için, aktif bir kullanıcı oturumu sırasında sunucu işletim sistemi düzeyinde yetkisiz kök (root) erişimi, bellek dökümü (memory dump) veya uygulama sürecinin ele geçirilmesi durumunda RAM'de bulunan `vault_key` anahtarları açığa çıkabilir. PassPass, tamamen ele geçirilmiş (fully compromised) bir işletim sistemi çekirdeğine karşı koruma iddiasında bulunmaz.
+- **Python Bellek Yönetimi**: Kullanıcı oturumu kapattığında veya oturum zaman aşımına uğradığında `VaultSessionStore` nesnesi referansı bellekten derhal kaldırır; ancak Python'un dahili çöp toplayıcısı (Garbage Collector) ve bellek tahsis mekanizmaları nedeniyle baytların fiziksel RAM üzerinde anında sıfırlandığı (zeroization) donanımsal düzeyde garanti edilemez.
+- **Master Password Kurtarma**: Sıfır bilgi prensibi gereği master password veritabanında tutulmadığından, unutulan veya kaybedilen master password'ler için sunucu tarafında bir parola sıfırlama mekanizması bulunmaz; kasanın kurtarılması matematiksel olarak mümkün değildir.
 
 ---
 
@@ -106,7 +119,7 @@ flowchart TD
 
 | Katman | Teknoloji / Kütüphane | Versiyon | Görevi / Açıklama |
 | :--- | :--- | :--- | :--- |
-| **Frontend** | React | 19.2 | Bileşen tabanlı SPA mimarisi |
+| **Frontend** | React | 19.2 | Modern SPA bileşen mimarisi |
 | **Frontend** | TypeScript | 6.0 | Tip güvenli kod tabanı |
 | **Frontend** | Vite | 8.2 | Ultra hızlı derleme ve HMR geliştirme sunucusu |
 | **Frontend** | React Router | 7.1 | İstemci tarafı rota yönetimi & Protected Route koruması |
@@ -136,12 +149,13 @@ passpass/
 │   │   │   └── routes/            # auth.py, passwords.py, health.py
 │   │   ├── core/                  # Çekirdek kriptografi, ayarlar & oturum deposu
 │   │   │   ├── config.py          # Pydantic Settings ortam değişkenleri
-│   │   │   ├── crypto.py          # Argon2id KDF & AES-256-GCM fonksiyonları
+│   │   │   ├── encryption.py      # AES-256-GCM şifreleme ve çözme fonksiyonları
 │   │   │   ├── security.py        # Password hashing & JWT işlemleri
-│   │   │   └── session.py         # Thread-safe in-memory VaultSessionStore
+│   │   │   ├── vault_kdf.py       # Argon2id anahtar türetme fonksiyonları
+│   │   │   └── vault_session.py   # Thread-safe in-memory VaultSessionStore
 │   │   ├── db/                    # Engine & SessionLocal bağlantı yapılandırması
 │   │   ├── models/                # SQLAlchemy ORM modelleri (User, PasswordEntry)
-│   │   ├── repositories/          # Veri tabanı erişim katmanı (Repository Pattern)
+│   │   ├── repositories/          # Veri erişim katmanı (UserRepository, PasswordRepository)
 │   │   ├── schemas/               # Pydantic girdi/çıktı DTO modelleri
 │   │   ├── services/              # İş mantığı katmanı (AuthService, PasswordService)
 │   │   └── main.py                # FastAPI app başlatıcı, CORS ve middleware
@@ -155,7 +169,7 @@ passpass/
 │   ├── src/
 │   │   ├── components/            # Yeniden kullanılabilir UI bileşenleri
 │   │   │   ├── common/            # Navbar, Toast, Butonlar
-│   │   │   └── vault/             # PasswordCard, Generator, StrengthMeter, Modallar
+│   │   │   └── vault/             # PasswordCard, Generator, StrengthBar, Modallar
 │   │   ├── context/               # AuthContext & Session State yönetimi
 │   │   ├── hooks/                 # Custom hook'lar (useAuth, useHealthCheck)
 │   │   ├── layouts/               # AppLayout ve sayfa düzenleri
@@ -176,6 +190,7 @@ passpass/
 ├── docker-compose.yml             # PostgreSQL 16 Alpine konteyneri
 ├── .env.example                   # Proje kök ortam değişkenleri örneği
 ├── .gitignore                     # Git tarafından izlenmeyecek dosyalar
+├── LICENSE                        # MIT Açık Kaynak Lisansı
 └── README.md                      # Proje dokümantasyonu
 ```
 
@@ -192,7 +207,7 @@ passpass/
 
 ### Adım 1: Depoyu Hazırlama & PostgreSQL Başlatma
 
-Kök dizindeki `.env.example` dosyasını kopyalayın ve Docker servisini ayağa kaldırın:
+Kök dizindeki `.env.example` dosyasını `.env` olarak kopyalayın ve Docker servisini ayağa kaldırın:
 
 ```bash
 # Kök dizinde:
@@ -204,6 +219,9 @@ docker compose up -d
 # Konteyner durumunu kontrol edin
 docker compose ps
 ```
+
+> [!TIP]
+> **Port Çakışması Notu**: Eğer yerel makinenizde zaten çalışan bir PostgreSQL servisi varsa (port 5432 doluysa), kök dizindeki `.env` dosyasında `POSTGRES_PORT=5433` yapabilirsiniz. Bu durumda `backend/.env` dosyasındaki `POSTGRES_PORT` değerini de `5433` olarak ayarlamayı unutmayın.
 
 ---
 
@@ -260,7 +278,7 @@ npm run dev
 
 ## 📡 API Referansı
 
-Tüm API uç noktaları `/api/v1` önekiyle sunulur. İnteraktif test için [http://localhost:8000/docs](http://localhost:8000/docs) adresini ziyaret edebilirsiniz.
+Tüm API uç noktaları `/api/v1` önekiyle sunulur. İnteraktif test ve şemalar için [http://localhost:8000/docs](http://localhost:8000/docs) adresini ziyaret edebilirsiniz.
 
 ### Kimlik Doğrulama (`/api/v1/auth`)
 
@@ -275,7 +293,7 @@ Tüm API uç noktaları `/api/v1` önekiyle sunulur. İnteraktif test için [htt
 
 | Metot | Uç Nokta | Yetkilendirme | Açıklama |
 | :--- | :--- | :---: | :--- |
-| `GET` | `/api/v1/passwords` | `Bearer` | Kullanıcının kasa özet listesini getirir (şifreler kapalı döner). |
+| `GET` | `/api/v1/passwords` | `Bearer` | Kullanıcının kasa özet listesini getirir (hassas alanlar liste görünümünde dönmez). |
 | `POST` | `/api/v1/passwords` | `Bearer` + `Vault-Token` | Yeni şifre kaydını AES-256-GCM ile şifreleyerek kasaya ekler. |
 | `GET` | `/api/v1/passwords/{id}` | `Bearer` + `Vault-Token` | Belirtilen kaydı çözer (`decrypted`) ve detayları döndürür. |
 | `PUT` | `/api/v1/passwords/{id}` | `Bearer` + `Vault-Token` | Mevcut kaydı günceller ve yeniden şifreler. |
@@ -291,11 +309,16 @@ Tüm API uç noktaları `/api/v1` önekiyle sunulur. İnteraktif test için [htt
 
 ## ⚙️ Ortam Değişkenleri (Environment Variables)
 
+> [!WARNING]
+> Aşağıdaki değerler **şablon / geliştirme placeholder** değerleridir. `POSTGRES_PASSWORD` ve `JWT_SECRET_KEY` alanları kasıtlı olarak boş bırakılmıştır. Bu değerler kesinlikle production ortamında kullanılmamalı; production kurulumlarında `openssl rand -hex 32` benzeri kriptografik olarak güçlü rastgele dizgiler atanmalıdır.
+
 ### Kök Dizin (`.env`)
 ```ini
 POSTGRES_USER=passpass
-POSTGRES_PASSWORD=passpass_dev_secret
+POSTGRES_PASSWORD=
 POSTGRES_DB=passpass_db
+# Docker Compose host port eşlemesi: Varsayılan 5432'dir.
+# Eğer host makinenizde 5432 doluysa 5433 yapın (5433:5432 eşlenir).
 POSTGRES_PORT=5432
 ```
 
@@ -304,29 +327,30 @@ POSTGRES_PORT=5432
 PROJECT_NAME="PassPass API"
 API_V1_STR="/api/v1"
 DEBUG=True
-
 POSTGRES_SERVER=localhost
 POSTGRES_PORT=5432
 POSTGRES_USER=passpass
-POSTGRES_PASSWORD=passpass_dev_secret
+POSTGRES_PASSWORD=
 POSTGRES_DB=passpass_db
-
 CORS_ORIGINS=["http://localhost:5173","http://127.0.0.1:5173"]
-
-JWT_SECRET_KEY=change-me-to-a-random-secret
+JWT_SECRET_KEY=
 JWT_ACCESS_TOKEN_EXPIRE_MINUTES=30
 ```
+
+> [!TIP]
+> **Port Uyumu**: Kök dizindeki Docker Compose'da `POSTGRES_PORT=5433` kullandıysanız, `backend/.env` dosyasında da `POSTGRES_PORT=5433` olarak ayarlamalısınız (FastAPI host makineden 5433 portuna bağlanır).
 
 ### Frontend (`frontend/.env`)
 ```ini
 VITE_API_BASE_URL=http://localhost:8000
 ```
 
+
 ---
 
 ## 🧪 Test & Doğrulama
 
-Uygulama genelinde toplam **181 adet otomatik test** bulunmaktadır.
+Uygulama genelinde toplam **181 adet otomatik test** bulunmaktadır:
 
 ### Backend Testleri (Pytest & E2E Smoke)
 
@@ -346,7 +370,7 @@ python tests/test_e2e_smoke.py
 ```bash
 cd frontend
 
-# 77 adet Vitest bileşen, utils ve entegrasyon testini çalıştırın
+# 77 adet Vitest bileşen, yardımcı fonksiyon ve entegrasyon testini çalıştırın
 npm test
 
 # Oxlint ile statik kod kalitesi analizi yapın
@@ -358,15 +382,15 @@ npm run build
 
 ---
 
-## 🛡️ Güvenlik Önerileri & Production Notları
+## 🛡️ Güvenlik Tavsiyeleri & Production Notları
 
-1. **HTTPS / TLS**: Production ortamında tüm istemci-sunucu trafiği mutlaka TLS 1.3 / HTTPS üzerinden geçmelidir.
+1. **HTTPS / TLS Zorunluluğu**: Production ortamında tüm istemci-sunucu trafiği mutlaka TLS 1.3 / HTTPS üzerinden geçmelidir.
 2. **Güçlü Master Password**: Master password hiçbir yerde saklanmadığı için unutulması durumunda kasa kurtarılamaz.
-3. **Gizli Anahtarlar**: Production'da `backend/.env` içerisindeki `JWT_SECRET_KEY` ve PostgreSQL parolalarını rastgele 64 karakterli güvenli dizgilerle değiştirin.
-4. **CORS Sıkılaştırma**: `CORS_ORIGINS` alanını yalnızca uygulamanın yayınlandığı domain ile sınırlandırın.
+3. **Gizli Anahtarların Değiştirilmesi**: Production'da `backend/.env` içerisindeki `JWT_SECRET_KEY` ve PostgreSQL parolalarını rastgele en az 64 karakterli güvenli dizgilerle değiştirin.
+4. **CORS Kısıtlaması**: `CORS_ORIGINS` alanını yalnızca uygulamanın canlıda yayınlandığı domain ile sınırlandırın.
 
 ---
 
 ## 📄 Lisans
 
-Bu proje [MIT Lisansı](LICENSE) kapsamında lisanslanmıştır. Kişisel veya ticari amaçlarla özgürce kullanılabilir, değiştirilebilir ve dağıtılabilir.
+Bu proje [MIT Lisansı](LICENSE) kapsamında lisanslanmıştır. Kişisel veya akademik amaçlarla özgürce incelenebilir, kullanılabilir ve geliştirilebilir.
